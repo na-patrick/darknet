@@ -837,18 +837,18 @@ typedef struct box_label {
 } box_label;
 
 // list.h
-//typedef struct node {
-//    void *val;
-//    struct node *next;
-//    struct node *prev;
-//} node;
+typedef struct node {
+   void *val;
+   struct node *next;
+   struct node *prev;
+} node;
 
 // list.h
-//typedef struct list {
-//    int size;
-//    node *front;
-//    node *back;
-//} list;
+typedef struct darknet_list {
+   int size;
+   node *front;
+   node *back;
+} darknet_list;
 
 // -----------------------------------------------------
 
@@ -874,6 +874,9 @@ LIB_API void free_detections(detection *dets, int n);
 LIB_API void fuse_conv_batchnorm(network net);
 LIB_API void calculate_binary_weights(network net);
 LIB_API char *detection_to_json(detection *dets, int nboxes, int classes, char **names, long long int frame_id, char *filename);
+LIB_API void free_network(network net);
+LIB_API void set_batch_network(network *net, int b);
+LIB_API darknet_list *read_data_cfg(char *filename);
 
 LIB_API layer* get_network_layer(network* net, int i);
 //LIB_API detection *get_network_boxes(network *net, int w, int h, float thresh, float hier, int *map, int relative, int *num, int letter);
@@ -906,6 +909,7 @@ LIB_API void free_data(data d);
 LIB_API pthread_t load_data(load_args args);
 LIB_API pthread_t load_data_in_thread(load_args args);
 LIB_API void *load_thread(void *ptr);
+LIB_API char **get_labels(char *filename);
 
 // dark_cuda.h
 LIB_API void cuda_pull_array(float *x_gpu, float *x, size_t n);
@@ -922,6 +926,8 @@ LIB_API tree *read_tree(char *filename);
 
 // option_list.h
 LIB_API metadata get_metadata(char *file);
+LIB_API int option_find_int(darknet_list *l, char *key, int def);
+LIB_API char *option_find_str(darknet_list *l, char *key, char *def);
 
 
 // http_stream.h

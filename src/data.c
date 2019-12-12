@@ -12,12 +12,12 @@
 
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
-list *get_paths(char *filename)
+darknet_list *get_paths(char *filename)
 {
     char *path;
     FILE *file = fopen(filename, "r");
     if(!file) file_error(filename);
-    list *lines = make_list();
+    darknet_list *lines = make_list();
     while((path=fgetl(file))){
         list_insert(lines, path);
     }
@@ -617,7 +617,7 @@ matrix load_tags_paths(char **paths, int n, int k)
 
 char **get_labels_custom(char *filename, int *size)
 {
-    list *plist = get_paths(filename);
+    darknet_list *plist = get_paths(filename);
     if(size) *size = plist->size;
     char **labels = (char **)list_to_array(plist);
     free_list(plist);

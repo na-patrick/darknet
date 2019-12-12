@@ -24,7 +24,7 @@ static int coco_ids[] = { 1,2,3,4,5,6,7,8,9,10,11,13,14,15,16,17,18,19,20,21,22,
 
 void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, int ngpus, int clear, int dont_show, int calc_map, int mjpeg_port, int show_imgs)
 {
-    list *options = read_data_cfg(datacfg);
+    darknet_list *options = read_data_cfg(datacfg);
     char *train_images = option_find_str(options, "train", "data/train.txt");
     char *valid_images = option_find_str(options, "valid", train_images);
     char *backup_directory = option_find_str(options, "backup", "/backup/");
@@ -100,7 +100,7 @@ void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, i
     int classes = l.classes;
     float jitter = l.jitter;
 
-    list *plist = get_paths(train_images);
+    darknet_list *plist = get_paths(train_images);
     int train_images_num = plist->size;
     char **paths = (char **)list_to_array(plist);
 
@@ -531,7 +531,7 @@ static void print_bdd_detections(FILE *fp, char *image_path, detection *dets, in
 void validate_detector(char *datacfg, char *cfgfile, char *weightfile, char *outfile)
 {
     int j;
-    list *options = read_data_cfg(datacfg);
+    darknet_list *options = read_data_cfg(datacfg);
     char *valid_images = option_find_str(options, "valid", "data/train.list");
     char *name_list = option_find_str(options, "names", "data/names.list");
     char *prefix = option_find_str(options, "results", "results");
@@ -548,7 +548,7 @@ void validate_detector(char *datacfg, char *cfgfile, char *weightfile, char *out
     fprintf(stderr, "Learning Rate: %g, Momentum: %g, Decay: %g\n", net.learning_rate, net.momentum, net.decay);
     srand(time(0));
 
-    list *plist = get_paths(valid_images);
+    darknet_list *plist = get_paths(valid_images);
     char **paths = (char **)list_to_array(plist);
 
     layer l = net.layers[net.n - 1];
@@ -728,9 +728,9 @@ void validate_detector_recall(char *datacfg, char *cfgfile, char *weightfile)
     srand(time(0));
 
     //list *plist = get_paths("data/coco_val_5k.list");
-    list *options = read_data_cfg(datacfg);
+    darknet_list *options = read_data_cfg(datacfg);
     char *valid_images = option_find_str(options, "valid", "data/train.txt");
-    list *plist = get_paths(valid_images);
+    darknet_list *plist = get_paths(valid_images);
     char **paths = (char **)list_to_array(plist);
 
     //layer l = net.layers[net.n - 1];
@@ -815,7 +815,7 @@ int detections_comparator(const void *pa, const void *pb)
 float validate_detector_map(char *datacfg, char *cfgfile, char *weightfile, float thresh_calc_avg_iou, const float iou_thresh, const int map_points, int letter_box, network *existing_net)
 {
     int j;
-    list *options = read_data_cfg(datacfg);
+    darknet_list *options = read_data_cfg(datacfg);
     char *valid_images = option_find_str(options, "valid", "data/train.txt");
     char *difficult_valid_images = option_find_str(options, "difficult", NULL);
     char *name_list = option_find_str(options, "names", "data/names.list");
@@ -852,12 +852,12 @@ float validate_detector_map(char *datacfg, char *cfgfile, char *weightfile, floa
     srand(time(0));
     printf("\n calculation mAP (mean average precision)...\n");
 
-    list *plist = get_paths(valid_images);
+    darknet_list *plist = get_paths(valid_images);
     char **paths = (char **)list_to_array(plist);
 
     char **paths_dif = NULL;
     if (difficult_valid_images) {
-        list *plist_dif = get_paths(difficult_valid_images);
+        darknet_list *plist_dif = get_paths(difficult_valid_images);
         paths_dif = (char **)list_to_array(plist_dif);
     }
 
@@ -1299,9 +1299,9 @@ void calc_anchors(char *datacfg, int num_of_clusters, int width, int height, int
     float* rel_width_height_array = (float*)calloc(1000, sizeof(float));
 
 
-    list *options = read_data_cfg(datacfg);
+    darknet_list *options = read_data_cfg(datacfg);
     char *train_images = option_find_str(options, "train", "data/train.list");
-    list *plist = get_paths(train_images);
+    darknet_list *plist = get_paths(train_images);
     int number_of_images = plist->size;
     char **paths = (char **)list_to_array(plist);
 
@@ -1432,7 +1432,7 @@ void calc_anchors(char *datacfg, int num_of_clusters, int width, int height, int
 void test_detector(char *datacfg, char *cfgfile, char *weightfile, char *filename, float thresh,
     float hier_thresh, int dont_show, int ext_output, int save_labels, char *outfile, int letter_box)
 {
-    list *options = read_data_cfg(datacfg);
+    darknet_list *options = read_data_cfg(datacfg);
     char *name_list = option_find_str(options, "names", "data/names.list");
     int names_size = 0;
     char **names = get_labels_custom(name_list, &names_size); //get_labels(name_list);
@@ -1654,7 +1654,7 @@ void run_detector(int argc, char **argv)
     else if (0 == strcmp(argv[2], "map")) validate_detector_map(datacfg, cfg, weights, thresh, iou_thresh, map_points, letter_box, NULL);
     else if (0 == strcmp(argv[2], "calc_anchors")) calc_anchors(datacfg, num_of_clusters, width, height, show);
     else if (0 == strcmp(argv[2], "demo")) {
-        list *options = read_data_cfg(datacfg);
+        darknet_list *options = read_data_cfg(datacfg);
         int classes = option_find_int(options, "classes", 20);
         char *name_list = option_find_str(options, "names", "data/names.list");
         char **names = get_labels(name_list);

@@ -12,12 +12,12 @@
 
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
-list *get_paths(char *filename)
+darknet_list *get_paths(char *filename)
 {
     char *path;
     FILE *file = fopen(filename, "r");
     if(!file) file_error(filename);
-    list *lines = make_list();
+    darknet_list *lines = make_list();
     while((path=fgetl(file))){
         list_insert(lines, path);
     }
@@ -380,7 +380,7 @@ int fill_truth_detection(const char *path, int num_boxes, float *truth, int clas
         // if truth (box for object) is smaller than 1x1 pix
         char buff[256];
         if (id >= classes) {
-            printf("\n Wrong annotation: class_id = %d. But class_id should be [from 0 to %d] \n", id, (classes-1));
+            printf("\n Wrong annotation: class_id = %d. But class_id should be [from 0 to %d], file: %s \n", id, (classes-1), labelpath);
             sprintf(buff, "echo %s \"Wrong annotation: class_id = %d. But class_id should be [from 0 to %d]\" >> bad_label.list", labelpath, id, (classes-1));
             system(buff);
             getchar();
@@ -394,7 +394,7 @@ int fill_truth_detection(const char *path, int num_boxes, float *truth, int clas
             continue;
         }
         if (x == 999999 || y == 999999) {
-            printf("\n Wrong annotation: x = 0, y = 0, < 0 or > 1 \n");
+            printf("\n Wrong annotation: x = 0, y = 0, < 0 or > 1, file: %s \n", labelpath);
             sprintf(buff, "echo %s \"Wrong annotation: x = 0 or y = 0\" >> bad_label.list", labelpath);
             system(buff);
             ++sub;
@@ -402,7 +402,7 @@ int fill_truth_detection(const char *path, int num_boxes, float *truth, int clas
             continue;
         }
         if (x <= 0 || x > 1 || y <= 0 || y > 1) {
-            printf("\n Wrong annotation: x = %f, y = %f \n", x, y);
+            printf("\n Wrong annotation: x = %f, y = %f, file: %s \n", x, y, labelpath);
             sprintf(buff, "echo %s \"Wrong annotation: x = %f, y = %f\" >> bad_label.list", labelpath, x, y);
             system(buff);
             ++sub;
@@ -410,14 +410,14 @@ int fill_truth_detection(const char *path, int num_boxes, float *truth, int clas
             continue;
         }
         if (w > 1) {
-            printf("\n Wrong annotation: w = %f \n", w);
+            printf("\n Wrong annotation: w = %f, file: %s \n", w, labelpath);
             sprintf(buff, "echo %s \"Wrong annotation: w = %f\" >> bad_label.list", labelpath, w);
             system(buff);
             w = 1;
             if (check_mistakes) getchar();
         }
         if (h > 1) {
-            printf("\n Wrong annotation: h = %f \n", h);
+            printf("\n Wrong annotation: h = %f, file: %s \n", h, labelpath);
             sprintf(buff, "echo %s \"Wrong annotation: h = %f\" >> bad_label.list", labelpath, h);
             system(buff);
             h = 1;
@@ -617,7 +617,7 @@ matrix load_tags_paths(char **paths, int n, int k)
 
 char **get_labels_custom(char *filename, int *size)
 {
-    list *plist = get_paths(filename);
+    darknet_list *plist = get_paths(filename);
     if(size) *size = plist->size;
     char **labels = (char **)list_to_array(plist);
     free_list(plist);

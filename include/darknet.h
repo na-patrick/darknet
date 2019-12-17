@@ -764,6 +764,14 @@ typedef struct detection{
     int points; // bit-0 - center, bit-1 - top-left-corner, bit-2 - bottom-right-corner
 } detection;
 
+// box.h
+typedef struct detection_with_class {
+    detection det;
+    // The most probable class id: the best class index in this->prob.
+    // Is filled temporary when processing results, otherwise not initialized
+    int best_class;
+} detection_with_class;
+
 // matrix.h
 typedef struct matrix {
     int rows, cols;
@@ -857,6 +865,8 @@ typedef struct darknet_list {
 LIB_API network *load_network(char *cfg, char *weights, int clear);
 LIB_API network *load_network_custom(char *cfg, char *weights, int clear, int batch);
 LIB_API network *load_network(char *cfg, char *weights, int clear);
+LIB_API void load_weights(network *net, char *filename);
+LIB_API network parse_network_cfg_custom(char *filename, int batch, int time_steps);
 
 // network.c
 LIB_API load_args get_base_args(network *net);
@@ -865,6 +875,7 @@ LIB_API load_args get_base_args(network *net);
 LIB_API void do_nms_sort(detection *dets, int total, int classes, float thresh);
 LIB_API void do_nms_obj(detection *dets, int total, int classes, float thresh);
 LIB_API void diounms_sort(detection *dets, int total, int classes, float thresh, NMS_KIND nms_kind, float beta1);
+LIB_API detection_with_class* get_actual_detections(detection *dets, int dets_num, float thresh, int* selected_detections_num, char **names);
 
 // network.h
 LIB_API float *network_predict(network net, float *input);
@@ -900,6 +911,9 @@ LIB_API void rgbgr_image(image im);
 LIB_API image make_image(int w, int h, int c);
 LIB_API image load_image_color(char *filename, int w, int h);
 LIB_API void free_image(image m);
+LIB_API void save_image(image im, const char *name);
+LIB_API void draw_detections_v3(image im, detection *dets, int num, float thresh, char **names, image **alphabet, int classes, int ext_output);
+LIB_API image **load_alphabet();
 
 // layer.h
 LIB_API void free_layer(layer);

@@ -269,6 +269,7 @@ detection_with_class* get_actual_detections(detection *dets, int dets_num, float
     for (i = 0; i < dets_num; ++i) {
         int best_class = -1;
         float best_class_prob = thresh;
+
         int j;
         for (j = 0; j < dets[i].classes; ++j) {
             int show = strncmp(names[j], "dont_show", 9);
@@ -277,6 +278,7 @@ detection_with_class* get_actual_detections(detection *dets, int dets_num, float
                 best_class_prob = dets[i].prob[j];
             }
         }
+
         if (best_class >= 0) {
             result_arr[selected_num].det = dets[i];
             result_arr[selected_num].best_class = best_class;
@@ -285,6 +287,7 @@ detection_with_class* get_actual_detections(detection *dets, int dets_num, float
     }
     if (selected_detections_num)
         *selected_detections_num = selected_num;
+
     return result_arr;
 }
 

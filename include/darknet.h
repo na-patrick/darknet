@@ -909,6 +909,7 @@ LIB_API void copy_image_from_bytes(image im, char *pdata);
 LIB_API image letterbox_image(image im, int w, int h);
 LIB_API void rgbgr_image(image im);
 LIB_API image make_image(int w, int h, int c);
+LIB_API image load_image(char *filename, int w, int h, int c);
 LIB_API image load_image_color(char *filename, int w, int h);
 LIB_API void free_image(image m);
 LIB_API void save_image(image im, const char *name);
@@ -924,6 +925,7 @@ LIB_API pthread_t load_data(load_args args);
 LIB_API pthread_t load_data_in_thread(load_args args);
 LIB_API void *load_thread(void *ptr);
 LIB_API char **get_labels(char *filename);
+LIB_API char **get_labels_custom(char *filename, int *size);
 
 // dark_cuda.h
 LIB_API void cuda_pull_array(float *x_gpu, float *x, size_t n);

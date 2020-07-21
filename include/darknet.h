@@ -877,6 +877,13 @@ typedef struct detection{
     int track_id;    
 } detection;
 
+typedef struct detection_with_class {
+    detection det;
+    // The most probable class id: the best class index in this->prob.
+    // Is filled temporary when processing results, otherwise not initialized
+    int best_class;
+} detection_with_class;
+
 // network.c -batch inference
 typedef struct det_num_pair {
     int num;
@@ -971,11 +978,18 @@ typedef struct node {
 } node;
 
 // list.h
-//typedef struct list {
+typedef struct darknet_list {
+   int size;
+   node *front;
+   node *back;
+} darknet_list;
+
+// list.h
+// typedef struct list {
 //    int size;
 //    node *front;
 //    node *back;
-//} list;
+// } list;
 // -----------------------------------------------------
 
 
@@ -984,6 +998,8 @@ LIB_API network *load_network(char *cfg, char *weights, int clear);
 LIB_API network *load_network_custom(char *cfg, char *weights, int clear, int batch);
 LIB_API network *load_network(char *cfg, char *weights, int clear);
 LIB_API void free_network(network net);
+LIB_API void load_weights(network *net, char *filename);
+LIB_API network parse_network_cfg_custom(char *filename, int batch, int time_steps);
 
 // network.c
 LIB_API load_args get_base_args(network *net);
@@ -1004,7 +1020,6 @@ LIB_API void free_batch_detections(det_num_pair *det_num_pairs, int n);
 LIB_API void fuse_conv_batchnorm(network net);
 LIB_API void calculate_binary_weights(network net);
 LIB_API char *detection_to_json(detection *dets, int nboxes, int classes, char **names, long long int frame_id, char *filename);
-LIB_API void free_network(network net);
 LIB_API void set_batch_network(network *net, int b);
 LIB_API darknet_list *read_data_cfg(char *filename);
 
@@ -1036,6 +1051,7 @@ LIB_API image load_image_color(char *filename, int w, int h);
 LIB_API void free_image(image m);
 LIB_API image crop_image(image im, int dx, int dy, int w, int h);
 LIB_API image resize_min(image im, int min);
+LIB_API void save_image(image im, const char *name);
 
 // layer.h
 LIB_API void free_layer_custom(layer l, int keep_cudnn_desc);

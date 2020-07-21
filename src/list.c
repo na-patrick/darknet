@@ -6,7 +6,7 @@
 
 darknet_list *make_list()
 {
-    list* l = (list*)xmalloc(sizeof(list));
+    darknet_list* l = (darknet_list*)xmalloc(sizeof(darknet_list));
     l->size = 0;
     l->front = 0;
     l->back = 0;

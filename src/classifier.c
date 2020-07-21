@@ -82,7 +82,7 @@ void train_classifier(char *datacfg, char *cfgfile, char *weightfile, int *gpus,
         free(labels);
         labels = NULL;
     }
-    list *plist = get_paths(train_list);
+    darknet_list *plist = get_paths(train_list);
     char **paths = (char **)list_to_array(plist);
     printf("%d\n", plist->size);
     int train_images_num = plist->size;

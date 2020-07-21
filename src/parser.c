@@ -356,7 +356,7 @@ softmax_layer parse_softmax(darknet_list *options, size_params params)
 	return layer;
 }
 
-contrastive_layer parse_contrastive(list *options, size_params params)
+contrastive_layer parse_contrastive(darknet_list *options, size_params params)
 {
     int classes = option_find_int(options, "classes", 1000);
     layer *yolo_layer = NULL;
@@ -423,7 +423,7 @@ float *get_classes_multipliers(char *cpc, const int classes, const float max_del
     return classes_multipliers;
 }
 
-layer parse_yolo(list *options, size_params params)
+layer parse_yolo(darknet_list *options, size_params params)
 {
     int classes = option_find_int(options, "classes", 20);
     int total = option_find_int(options, "num", 1);
@@ -789,7 +789,7 @@ layer parse_reorg_old(darknet_list *options, size_params params)
     return layer;
 }
 
-maxpool_layer parse_local_avgpool(list *options, size_params params)
+maxpool_layer parse_local_avgpool(darknet_list *options, size_params params)
 {
     int stride = option_find_int(options, "stride", 1);
     int stride_x = option_find_int_quiet(options, "stride_x", stride);
@@ -812,7 +812,7 @@ maxpool_layer parse_local_avgpool(list *options, size_params params)
     return layer;
 }
 
-maxpool_layer parse_maxpool(list *options, size_params params)
+maxpool_layer parse_maxpool(darknet_list *options, size_params params)
 {
     int stride = option_find_int(options, "stride",1);
     int stride_x = option_find_int_quiet(options, "stride_x", stride);

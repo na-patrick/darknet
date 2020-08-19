@@ -69,6 +69,7 @@ LAYER_TYPE string_to_layer_type(char * type)
     if (strcmp(type, "[gru]")==0) return GRU;
     if (strcmp(type, "[lstm]")==0) return LSTM;
     if (strcmp(type, "[conv_lstm]") == 0) return CONV_LSTM;
+    if (strcmp(type, "[history]") == 0) return HISTORY;
     if (strcmp(type, "[rnn]")==0) return RNN;
     if (strcmp(type, "[conn]")==0
             || strcmp(type, "[connected]")==0) return CONNECTED;
@@ -228,6 +229,7 @@ convolutional_layer parse_convolutional(darknet_list *options, size_params param
     layer.angle = option_find_float_quiet(options, "angle", 15);
     layer.grad_centr = option_find_int_quiet(options, "grad_centr", 0);
     layer.reverse = option_find_float_quiet(options, "reverse", 0);
+    layer.coordconv = option_find_int_quiet(options, "coordconv", 0);
 
     if(params.net.adam){
         layer.B1 = params.net.B1;
@@ -329,7 +331,14 @@ layer parse_conv_lstm(darknet_list *options, size_params params)
     return l;
 }
 
-connected_layer parse_connected(darknet_list *options, size_params params)
+layer parse_history(list *options, size_params params)
+{
+    int history_size = option_find_int(options, "history_size", 4);
+    layer l = make_history_layer(params.batch, params.h, params.w, params.c, history_size, params.time_steps, params.train);
+    return l;
+}
+
+connected_layer parse_connected(darknet_list* options, size_params params)
 {
     int output = option_find_int(options, "output",1);
     char *activation_s = option_find_str(options, "activation", "logistic");
@@ -363,6 +372,11 @@ contrastive_layer parse_contrastive(darknet_list *options, size_params params)
     int yolo_layer_id = option_find_int_quiet(options, "yolo_layer", 0);
     if (yolo_layer_id < 0) yolo_layer_id = params.index + yolo_layer_id;
     if(yolo_layer_id != 0) yolo_layer = params.net.layers + yolo_layer_id;
+    if (yolo_layer->type != YOLO) {
+        printf(" Error: [contrastive] layer should point to the [yolo] layer instead of %d layer! \n", yolo_layer_id);
+        getchar();
+        exit(0);
+    }
 
     contrastive_layer layer = make_contrastive_layer(params.batch, params.w, params.h, params.c, classes, params.inputs, yolo_layer);
     layer.temperature = option_find_float_quiet(options, "temperature", 1);
@@ -501,6 +515,10 @@ layer parse_yolo(darknet_list *options, size_params params)
         l.embedding_output = (float*)xcalloc(le.batch * le.outputs, sizeof(float));
         l.embedding_size = le.n / l.n;
         printf(" embedding_size = %d \n", l.embedding_size);
+        if (le.n % l.n != 0) {
+            printf(" Warning: filters=%d number in embedding_layer=%d isn't divisable by number of anchors %d \n", le.n, embedding_layer_id, l.n);
+            getchar();
+        }
     }
 
     char *map_file = option_find_str(options, "map", 0);
@@ -832,6 +850,7 @@ maxpool_layer parse_maxpool(darknet_list *options, size_params params)
     if(!(h && w && c)) error("Layer before [maxpool] layer must output image.");
 
     maxpool_layer layer = make_maxpool_layer(batch, h, w, c, size, stride_x, stride_y, padding, maxpool_depth, out_channels, antialiasing, avgpool, params.train);
+    layer.maxpool_zero_nonmax = option_find_int_quiet(options, "maxpool_zero_nonmax", 0);
     return layer;
 }
 
@@ -1367,6 +1386,8 @@ network parse_network_cfg_custom(char *filename, int batch, int time_steps)
             l = parse_lstm(options, params);
         }else if (lt == CONV_LSTM) {
             l = parse_conv_lstm(options, params);
+        }else if (lt == HISTORY) {
+            l = parse_history(options, params);
         }else if(lt == CRNN){
             l = parse_crnn(options, params);
         }else if(lt == CONNECTED){
@@ -1646,6 +1667,8 @@ network parse_network_cfg_custom(char *filename, int batch, int time_steps)
         }
 
         // pre-allocate memory for inference on Tensor Cores (fp16)
+        *net.max_input16_size = 0;
+        *net.max_output16_size = 0;
         if (net.cudnn_half) {
             *net.max_input16_size = max_inputs;
             CHECK_CUDA(cudaMalloc((void **)net.input16_gpu, *net.max_input16_size * sizeof(short))); //sizeof(half)

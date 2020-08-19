@@ -1,11 +1,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include "list.h"
+#include "utils.h"
 #include "option_list.h"
 
 darknet_list *make_list()
 {
-    darknet_list* l = (darknet_list*)malloc(sizeof(darknet_list));
+    darknet_list* l = (darknet_list*)xmalloc(sizeof(darknet_list));
     l->size = 0;
     l->front = 0;
     l->back = 0;
@@ -40,7 +41,7 @@ void *list_pop(darknet_list *l){
 
 void list_insert(darknet_list *l, void *val)
 {
-    node* newnode = (node*)malloc(sizeof(node));
+    node* newnode = (node*)xmalloc(sizeof(node));
     newnode->val = val;
     newnode->next = 0;
 
@@ -104,7 +105,7 @@ void free_list_contents_kvp(darknet_list *l)
 
 void **list_to_array(darknet_list *l)
 {
-    void** a = (void**)calloc(l->size, sizeof(void*));
+    void** a = (void**)xcalloc(l->size, sizeof(void*));
     int count = 0;
     node *n = l->front;
     while(n){

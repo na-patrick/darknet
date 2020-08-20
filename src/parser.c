@@ -331,7 +331,7 @@ layer parse_conv_lstm(darknet_list *options, size_params params)
     return l;
 }
 
-layer parse_history(list *options, size_params params)
+layer parse_history(darknet_list *options, size_params params)
 {
     int history_size = option_find_int(options, "history_size", 4);
     layer l = make_history_layer(params.batch, params.h, params.w, params.c, history_size, params.time_steps, params.train);

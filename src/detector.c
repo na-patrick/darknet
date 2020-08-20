@@ -312,7 +312,8 @@ void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, i
             else fprintf(stderr, "\n Tensor Cores are used.\n");
             fflush(stderr);
         }
-        fprintf(stdout, "\n{ uuid: '%s', training: { iteration: %d, loss: %f, avg_loss: %f, rate: %f, seconds: %lf, eta: %f } }\n", 
+
+        fprintf(stdout, "\n{ 'uuid': '%s', 'training': { 'iteration': %d, 'loss': %f, 'avg_loss': %f, 'rate': %f, 'seconds': %lf, 'eta': %f } }\n", 
             UUID, iteration, loss, avg_loss, get_current_rate(net), (what_time_is_it_now() - time), avg_time);
 
         fflush(stdout);
@@ -1317,9 +1318,11 @@ float validate_detector_map(char *datacfg, char *cfgfile, char *weightfile, floa
             avg_precision = avg_precision / map_points;
         }
 
-        printf("class_id = %d, name = %s, ap = %2.2f%%   \t (TP = %d, FP = %d) \n",
-            i, names[i], avg_precision * 100, tp_for_thresh_per_class[i], fp_for_thresh_per_class[i]);
-
+        // printf("class_id = %d, name = %s, ap = %2.2f%%   \t (TP = %d, FP = %d) \n",
+        //     i, names[i], avg_precision * 100, tp_for_thresh_per_class[i], fp_for_thresh_per_class[i]);
+        printf("{ 'uuid': '%s', 'prediction_accuracy': { 'class_id' = %d, 'name' = '%s', 'ap' = %2.2f%%, 'TP' = %d, 'FP' = %d } \n",
+            UUID, i, names[i], avg_precision * 100, tp_for_thresh_per_class[i], fp_for_thresh_per_class[i]);
+        
         float class_precision = (float)tp_for_thresh_per_class[i] / ((float)tp_for_thresh_per_class[i] + (float)fp_for_thresh_per_class[i]);
         float class_recall = (float)tp_for_thresh_per_class[i] / ((float)tp_for_thresh_per_class[i] + (float)(truth_classes_count[i] - tp_for_thresh_per_class[i]));
         //printf("Precision = %1.2f, Recall = %1.2f, avg IOU = %2.2f%% \n\n", class_precision, class_recall, avg_iou_per_class[i]);
@@ -1341,8 +1344,8 @@ float validate_detector_map(char *datacfg, char *cfgfile, char *weightfile, floa
     if (map_points) printf("used %d Recall-points \n", map_points);
     else printf("used Area-Under-Curve for each unique Recall \n");
 
-    printf(" mean average precision (mAP@%0.2f) = %f, or %2.2f %% \n", iou_thresh, mean_average_precision, mean_average_precision * 100);
-
+    // printf(" mean average precision (mAP@%0.2f) = %f, or %2.2f %% \n", iou_thresh, mean_average_precision, mean_average_precision * 100);
+    printf("{ 'uuid': '%s', 'mAP': { 'type': 'mAP@%0.2f', 'mAP': %f }\n", UUID, iou_thresh, mean_average_precision);
     for (i = 0; i < classes; ++i) {
         free(pr[i]);
     }

@@ -312,6 +312,7 @@ void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, i
             else fprintf(stderr, "\n Tensor Cores are used.\n");
             fflush(stderr);
         }
+
         fprintf(stdout, "\n{ 'uuid': '%s', 'training': { 'iteration': %d, 'loss': %f, 'avg_loss': %f, 'rate': %f, 'seconds': %lf, 'eta': %f } }\n", 
             UUID, iteration, loss, avg_loss, get_current_rate(net), (what_time_is_it_now() - time), avg_time);
 

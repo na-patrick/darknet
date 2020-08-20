@@ -312,7 +312,9 @@ void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, i
             else fprintf(stderr, "\n Tensor Cores are used.\n");
             fflush(stderr);
         }
-        printf("\n %d: %f, %f avg loss, %f rate, %lf seconds, %d images, %f hours left\n", iteration, loss, avg_loss, get_current_rate(net), (what_time_is_it_now() - time), iteration*imgs, avg_time);
+        fprintf(stdout, "\n{ uuid: '%s', training: { iteration: %d, loss: %f, avg_loss: %f, rate: %f, seconds: %lf, eta: %f } }\n", 
+            UUID, iteration, loss, avg_loss, get_current_rate(net), (what_time_is_it_now() - time), avg_time);
+
         fflush(stdout);
 
         int draw_precision = 0;
@@ -354,11 +356,11 @@ void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, i
             iter_map = iteration;
             mean_average_precision = validate_detector_map(datacfg, cfgfile, weightfile, 0.25, 0.5, 0, net.letter_box, &net_map);// &net_combined);
             printf("\n mean_average_precision (mAP@0.5) = %f \n", mean_average_precision);
-            if (mean_average_precision > best_map) {
+            if (mean_average_precision > 80.0) {
                 best_map = mean_average_precision;
-                printf("New best mAP!\n");
+                printf("mAP more than 80.0 %!\n");
                 char buff[256];
-                sprintf(buff, "%s/%s_best.weights", backup_directory, base);
+                sprintf(buff, "%s/%s_%d_mark.weights", backup_directory, base, iteration);
                 save_weights(net, buff);
             }
 
@@ -1931,6 +1933,7 @@ void draw_object(char *datacfg, char *cfgfile, char *weightfile, char *filename,
 
 void run_detector(int argc, char **argv)
 {
+    UUID = find_char_arg(argc, argv, "-uuid", "not defined");   // set as a global variable to use from the log
     int dont_show = find_arg(argc, argv, "-dont_show");
     int benchmark = find_arg(argc, argv, "-benchmark");
     int benchmark_layers = find_arg(argc, argv, "-benchmark_layers");

@@ -360,7 +360,7 @@ void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, i
                 best_map = mean_average_precision;
                 printf("mAP more than 80.0 %!\n");
                 char buff[256];
-                sprintf(buff, "%s/%s_mark.weights", backup_directory, base);
+                sprintf(buff, "%s/%s_%d_mark.weights", backup_directory, base, iteration);
                 save_weights(net, buff);
             }
 

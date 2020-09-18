@@ -360,7 +360,7 @@ void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, i
             if (mean_average_precision > 0.8 || mean_average_precision > best_map) {
                 best_map = mean_average_precision;
                 char buff[256];
-                sprintf(buff, "%s/%s_%d_mark.weights", backup_directory, base, iteration);
+                sprintf(buff, "%s/%s_%d_mark_%.2f.weights", backup_directory, base, iteration, mean_average_precision);
                 save_weights(net, buff);
             }
 

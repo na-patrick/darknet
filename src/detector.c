@@ -314,7 +314,7 @@ void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, i
         }
 
         fprintf(stdout, "\n{ 'uuid': '%s', 'iteration': %d, 'training': { 'loss': %f, 'avg_loss': %f, 'rate': %f, 'seconds': %lf, 'eta': %f } }\n", 
-            UUID, iteration, loss, avg_loss, get_current_rate(net), (what_time_is_it_now() - time), avg_time);
+            NVUUID, iteration, loss, avg_loss, get_current_rate(net), (what_time_is_it_now() - time), avg_time);
 
         fflush(stdout);
 
@@ -1320,7 +1320,7 @@ float validate_detector_map(char *datacfg, char *cfgfile, char *weightfile, floa
         // printf("class_id = %d, name = %s, ap = %2.2f%%   \t (TP = %d, FP = %d) \n",
         //     i, names[i], avg_precision * 100, tp_for_thresh_per_class[i], fp_for_thresh_per_class[i]);
         printf("{ 'uuid': '%s', 'iteration': %d, 'prediction_accuracy': { 'class_id' = %d, 'name' = '%s', 'ap' = %2.2f%%, 'TP' = %d, 'FP' = %d } \n",
-            UUID, iteration, i, names[i], avg_precision * 100, tp_for_thresh_per_class[i], fp_for_thresh_per_class[i]);
+            NVUUID, iteration, i, names[i], avg_precision * 100, tp_for_thresh_per_class[i], fp_for_thresh_per_class[i]);
         
         float class_precision = (float)tp_for_thresh_per_class[i] / ((float)tp_for_thresh_per_class[i] + (float)fp_for_thresh_per_class[i]);
         float class_recall = (float)tp_for_thresh_per_class[i] / ((float)tp_for_thresh_per_class[i] + (float)(truth_classes_count[i] - tp_for_thresh_per_class[i]));
@@ -1344,7 +1344,7 @@ float validate_detector_map(char *datacfg, char *cfgfile, char *weightfile, floa
     else printf("used Area-Under-Curve for each unique Recall \n");
 
     // printf(" mean average precision (mAP@%0.2f) = %f, or %2.2f %% \n", iou_thresh, mean_average_precision, mean_average_precision * 100);
-    printf("{ 'uuid': '%s', 'iteration': %d, 'mAP': { 'type': 'mAP@%0.2f', 'mAP': %f }\n", UUID, iteration, iou_thresh, mean_average_precision);
+    printf("{ 'uuid': '%s', 'iteration': %d, 'mAP': { 'type': 'mAP@%0.2f', 'mAP': %f }\n", NVUUID, iteration, iou_thresh, mean_average_precision);
     for (i = 0; i < classes; ++i) {
         free(pr[i]);
     }
@@ -1935,7 +1935,7 @@ void draw_object(char *datacfg, char *cfgfile, char *weightfile, char *filename,
 
 void run_detector(int argc, char **argv)
 {
-    UUID = find_char_arg(argc, argv, "-uuid", "not defined");   // set as a global variable to use from the log
+    NVUUID = find_char_arg(argc, argv, "-uuid", "not defined");   // set as a global variable to use from the log
     int dont_show = find_arg(argc, argv, "-dont_show");
     int benchmark = find_arg(argc, argv, "-benchmark");
     int benchmark_layers = find_arg(argc, argv, "-benchmark_layers");

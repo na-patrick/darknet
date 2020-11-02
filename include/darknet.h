@@ -997,7 +997,7 @@ typedef struct darknet_list {
 // } list;
 // -----------------------------------------------------
 
-static char* UUID;
+static char* NVUUID;
 
 // parser.c
 LIB_API network *load_network(char *cfg, char *weights, int clear);
